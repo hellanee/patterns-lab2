@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,14 +6,21 @@ using System.Threading.Tasks;
 
 namespace patterns_lab2
 {
-    public class Food
+    public class Burger
     {
         string data;
-        public Food() => data = "Состав блюда:\n";
-        public string aboutFood() => data;
+        public Burger() => data = "Состав блюда:\n";
+        public string aboutBurger() => data;
         public void appendData(string type) => data += type;
     }
-    public interface IFood
+    public class Roll
+    {
+        string data;
+        public Roll() => data = "Состав блюда:\n";
+        public string aboutRoll() => data;
+        public void appendData(string type) => data += type;
+    }
+    public interface IBurger
     {
         void addCheese();
         void addPickles();
@@ -23,13 +30,25 @@ namespace patterns_lab2
         void addHotSauce();
         void addMeat(string str);
         void createBread();
-        Food getFood();
+        Burger getBurger();
+    }
+    public interface IRoll
+    {
+        void addCheese();
+        void addPickles();
+        void addLettuce();
+        void addTomato();
+        void addJalapeno();
+        void addHotSauce();
+        void addMeat(string str);
+        void createBread();
+        Roll getRoll();
     }
 
-    public class BurgerBuilder : IFood
+    public class BurgerBuilder : IBurger
     {
-        private Food food;
-        public BurgerBuilder() => food = new Food();
+        private Burger food;
+        public BurgerBuilder() => food = new Burger();
         public void addCheese() => food.appendData("Cыр\n");
         public void addPickles() => food.appendData("Огурцы\n");
         public void addLettuce() => food.appendData("Салат\n");
@@ -38,12 +57,12 @@ namespace patterns_lab2
         public void addHotSauce() => food.appendData("Острый соус\n");
         public void addMeat(string str) => food.appendData("Мясо: " + str + "\n");
         public void createBread() => food.appendData("Ингредиенты в булочке с кунжутом\n");
-        public Food getFood() => food;
+        public Burger getBurger() => food;
     }
-    public class RollBuilder : IFood
+    public class RollBuilder : IRoll
     {
-        private Food food;
-        public RollBuilder() => food = new Food();
+        private Roll food;
+        public RollBuilder() => food = new Roll();
         public void addCheese() => food.appendData("Cыр\n");
         public void addPickles() => food.appendData("Огурцы\n");
         public void addLettuce() => food.appendData("Салат\n");
@@ -52,44 +71,54 @@ namespace patterns_lab2
         public void addHotSauce() => food.appendData("Острый соус\n");
         public void addMeat(string str) => food.appendData("Мясо: " + str + "\n");
         public void createBread() => food.appendData("Ингредиенты, завернутые в лаваш\n");
-        public Food getFood() => food;
+        public Roll getRoll() => food;
     }
     public class Order
     {
-        private IFood food;
-        public Order(IFood food) => this.food = food;
-        public void setFoodType(IFood food) => this.food = food;
-        public Food createCheeseburger()
+        private IBurger burger;
+        private IRoll roll;
+        public Order(IBurger burger) => this.burger = burger;
+        public void setFoodType(IBurger burger) => this.burger = burger;
+        public Order(IRoll roll) => this.roll = roll;
+        public void setFoodType(IRoll roll) => this.roll = roll;
+        public Burger createCheeseburger()
         {
-            food.addCheese();
-            food.addMeat("котлета из говядины");
-            food.addLettuce();
-            food.createBread();
-            return food.getFood();
+            burger.addCheese();
+            burger.addMeat("котлета из говядины");
+            burger.addLettuce();
+            burger.createBread();
+            return burger.getBurger();
         }
-        public Food createHotRoll()
+        public Roll createHotRoll()
         {
-            food.addJalapeno();
-            food.addHotSauce();
-            food.addLettuce();
-            food.addMeat("кусочки курицы");
-            food.addPickles();
-            food.createBread();
-            return food.getFood();
+            roll.addJalapeno();
+            roll.addHotSauce();
+            roll.addLettuce();
+            roll.addMeat("кусочки курицы");
+            roll.addPickles();
+            roll.createBread();
+            return roll.getRoll();
         }
-        public IFood getFood() => this.food;
+        public IBurger getBurger() => this.burger;
+        public IRoll getRoll() => this.roll;
     }
 
     public class OrderMemento
     {
         private Order order;
-        public OrderMemento(Order order)
+        public OrderMemento(Order order, string type)
         {
-            this.order=new Order(order.getFood());
+            if(type=="бургер")
+                this.order=new Order(order.getBurger());
+            if (type == "ролл")
+                this.order = new Order(order.getRoll());
         }
-        public void save(Order order)
+        public void save(Order order, string type)
         {
-            this.order = order;
+            if (type == "бургер")
+                this.order = new Order(order.getBurger());
+            if (type == "ролл")
+                this.order = new Order(order.getRoll());
         }
         public Order restore()
         {
@@ -102,21 +131,21 @@ namespace patterns_lab2
     {
         static void Main(string[] args)
         {
-            IFood foodItem1 = new BurgerBuilder();
+            IBurger foodItem1 = new BurgerBuilder();
 
             Order order1 = new Order(foodItem1);
 
-            Food burger = order1.createCheeseburger();
-            Console.WriteLine(burger.aboutFood());
-            OrderMemento memento = new OrderMemento(order1);
+            Burger burger = order1.createCheeseburger();
+            Console.WriteLine(burger.aboutBurger());
+            OrderMemento memento = new OrderMemento(order1, "бургер");
 
-            IFood foodItem2 = new RollBuilder();
+            IRoll foodItem2 = new RollBuilder();
             Order order2 = new Order(foodItem2);
             order2.setFoodType(foodItem2);
   
-            Food roll = order2.createHotRoll();
-            Console.WriteLine(roll.aboutFood());
-            memento.save(order2);
+            Roll roll = order2.createHotRoll();
+            Console.WriteLine(roll.aboutRoll());
+            memento.save(order2, "ролл");
 
             Console.ReadKey();
         }
