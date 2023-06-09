@@ -6,170 +6,94 @@ using System.Threading.Tasks;
 
 namespace patterns_lab2
 {
-    public class Burger
+    public class Food
     {
-        private bool cheese = false;
-        private bool pickles = false;
-        private bool lettuce = false;
-        private bool tomato = false;
-        private bool jalapeno = false;
-        private bool hotsauce = false;
-        private string meat = "";
-        public Burger(BurgerBuilder builder)
-        {
-            this.meat = builder.meat;
-            this.pickles = builder.pickles;
-            this.lettuce = builder.lettuce;
-            this.tomato = builder.tomato;
-            this.jalapeno = builder.jalapeno;
-            this.hotsauce = builder.hotsauce;
-            this.cheese = builder.cheese;
-        }
+        string data;
+        public Food() => data = "Состав блюда:\n";
+        public string aboutFood() => data;
+        public void appendData(string type) => data += type;
     }
-    public class BurgerBuilder
+    public interface IFood
     {
-        public string meat = "";
-        public bool cheese = false;
-        public bool pickles = false;
-        public bool lettuce = false;
-        public bool tomato = false;
-        public bool jalapeno = false;
-        public bool hotsauce = false;
-        public BurgerBuilder()
-        {
-        }
-        public BurgerBuilder(string meat)
-        {
-            this.meat = meat;
-            Console.WriteLine("Ingredients:");
-            Console.WriteLine(meat);
-        }
-        public BurgerBuilder useMeat(string meat)
-        {
-            this.meat = meat;
-            Console.WriteLine(meat);
-            return this;
-        }
-        public BurgerBuilder addCheese()
-        {
-            this.cheese = true;
-            Console.WriteLine("Cheese");
-            return this;
-        }
-        public BurgerBuilder addPickles()
-        {
-            this.pickles = true;
-            Console.WriteLine("Pickles");
-            return this;
-        }
-        public BurgerBuilder addLettuce()
-        {
-            this.lettuce = true;
-            Console.WriteLine("Lettuce");
-            return this;
-        }
-        public BurgerBuilder addTomato()
-        {
-            this.tomato = true;
-            Console.WriteLine("Tomato");
-            return this;
-        }
-        public BurgerBuilder addJalapeno()
-        {
-            this.jalapeno = true;
-            Console.WriteLine("Jalapeno");
-            return this;
-        }
-        public BurgerBuilder addHotsauce()
-        {
-            this.hotsauce = true;
-            Console.WriteLine("Hot Sauce");
-            return this;
-        }
-        public Burger build()
-        {
-            Console.WriteLine("Your burger is made!\n");
-            return new Burger(this);
-        }
+        void addCheese();
+        void addPickles();
+        void addLettuce();
+        void addTomato();
+        void addJalapeno();
+        void addHotSauce();
+        void addMeat(string str);
+        void createBread();
+        Food getFood();
     }
-    public class Recipe
-    {
-        private BurgerBuilder builder;
-        private string name;
-        public Recipe()
-        {
-            builder = new BurgerBuilder();
-        }
-        public BurgerBuilder getBuilder()
-        {
-            return this.builder;
-        }
-        public void makeCheeseBurger()
-        {
-            name = "Cheeseburger";
-            Console.WriteLine(name);
-            builder.useMeat("Beef");
-            builder.addCheese();
-            builder.build();
-        }
-        public void makeHotChickenBurger()
-        {
-            name = "Chickenburger";
-            Console.WriteLine(name);
-            builder.useMeat("Chicken");
-            builder.addHotsauce();
-            builder.addJalapeno();
-            builder.build();
-        }
-        public void makePickleFishBurger()
-        {
-            name = "Pickle Fish Burger";
-            Console.WriteLine(name);
-            builder.useMeat("Fish");
-            builder.addPickles();
-            builder.build();
-        }
-        public void makeBigBurger()
-        {
-            name = "Big Burger";
-            Console.WriteLine(name);
-            builder.useMeat("Beef");
-            builder.addCheese();
-            builder.addLettuce();
-            builder.addTomato();
-            builder.addPickles();
-            builder.addHotsauce();
-            builder.addJalapeno();
-            builder.build();
-        }
-        public string getName()
-        {
-            return this.name;
-        }
 
+    public class BurgerBuilder : IFood
+    {
+        private Food food;
+        public BurgerBuilder() => food = new Food();
+        public void addCheese() => food.appendData("Cыр\n");
+        public void addPickles() => food.appendData("Огурцы\n");
+        public void addLettuce() => food.appendData("Салат\n");
+        public void addTomato() => food.appendData("Томаты\n");
+        public void addJalapeno() => food.appendData("Халапеньо\n");
+        public void addHotSauce() => food.appendData("Острый соус\n");
+        public void addMeat(string str) => food.appendData("Мясо: " + str + "\n");
+        public void createBread() => food.appendData("Ингредиенты в булочке с кунжутом\n");
+        public Food getFood() => food;
     }
+    public class RollBuilder : IFood
+    {
+        private Food food;
+        public RollBuilder() => food = new Food();
+        public void addCheese() => food.appendData("Cыр\n");
+        public void addPickles() => food.appendData("Огурцы\n");
+        public void addLettuce() => food.appendData("Салат\n");
+        public void addTomato() => food.appendData("Томаты\n");
+        public void addJalapeno() => food.appendData("Халапеньо\n");
+        public void addHotSauce() => food.appendData("Острый соус\n");
+        public void addMeat(string str) => food.appendData("Мясо: " + str + "\n");
+        public void createBread() => food.appendData("Ингредиенты, завернутые в лаваш\n");
+        public Food getFood() => food;
+    }
+    public class Order
+    {
+        private IFood food;
+        public Order(IFood food) => this.food = food;
+        public void setFoodType(IFood food) => this.food = food;
+        public Food createCheeseburger()
+        {
+            food.addCheese();
+            food.addMeat("котлета из говядины");
+            food.addLettuce();
+            food.createBread();
+            return food.getFood();
+        }
+        public Food createHotRoll()
+        {
+            food.addJalapeno();
+            food.addHotSauce();
+            food.addLettuce();
+            food.addMeat("кусочки курицы");
+            food.addPickles();
+            food.createBread();
+            return food.getFood();
+        }
+        public IFood getFood() => this.food;
+    }
+
     public class OrderMemento
     {
-        private BurgerBuilder builder;
-        private string name;
-        public OrderMemento()
+        private Order order;
+        public OrderMemento(Order order)
         {
-            builder=new BurgerBuilder();
+            this.order=new Order(order.getFood());
         }
-        public void save(BurgerBuilder order)
+        public void save(Order order)
         {
-            this.name = "Custom Burger";
-            this.builder = order;
+            this.order = order;
         }
-        public void save(Recipe order)
+        public Order restore()
         {
-            this.name = order.getName();
-            this.builder = order.getBuilder();
-        }
-        public void restore()
-        {
-            Console.WriteLine(this.name);
-            this.builder.build();
+            return this.order;
         }
 
     }
@@ -178,24 +102,21 @@ namespace patterns_lab2
     {
         static void Main(string[] args)
         {
-            //создание объекта для сохранения заказа
-            OrderMemento memento = new OrderMemento();
+            IFood foodItem1 = new BurgerBuilder();
 
-            //создание собственного бургера через конструктор
-            BurgerBuilder order1 = new BurgerBuilder("Chicken");
-            order1.addCheese();
-            order1.addLettuce();
-            order1.addTomato();
-            order1.build();
-            memento.save(order1);
+            Order order1 = new Order(foodItem1);
 
-            //создание бургера через класс с готовыми рецептами, использующий конструктор
-            Recipe order2 = new Recipe();
-            order2.makeBigBurger();
+            Food burger = order1.createCheeseburger();
+            Console.WriteLine(burger.aboutFood());
+            OrderMemento memento = new OrderMemento(order1);
+
+            IFood foodItem2 = new RollBuilder();
+            Order order2 = new Order(foodItem2);
+            order2.setFoodType(foodItem2);
+  
+            Food roll = order2.createHotRoll();
+            Console.WriteLine(roll.aboutFood());
             memento.save(order2);
-
-            //повтор предыдущего сохраненного заказа
-            memento.restore();
 
             Console.ReadKey();
         }
